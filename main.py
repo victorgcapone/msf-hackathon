@@ -37,8 +37,20 @@ conversation_state = ConversationState(memory)
 # ADAPTER.use(user_state)
 ADAPTER.use(conversation_state)
 
+estado = {}
 
 # Methods to generate cards
+
+def create_possible_dog_card() -> Attachment:
+    card = HeroCard(title='',
+                    images=[CardImage(url='https://ogimg.infoglobo.com.br/in/23385661-a7d-b19/GEOMIDIA/375/xboo.jpg.pagespeed.ic.eoDpEM4vvQ.jpg')],
+                    buttons=[CardAction(type=ActionTypes.open_url,
+                                        title='O cachorro se parece com esse?',
+                                        value='https://docs.microsoft.com/en-us/azure/bot-service/')],
+                    )
+    return CardFactory.hero_card(card)
+		
+
 def create_adaptive_card() -> Attachment:
     return CardFactory.adaptive_card(ADAPTIVE_CARD_CONTENT)
 
@@ -74,6 +86,22 @@ def create_hero_card() -> Attachment:
                     buttons=[CardAction(type=ActionTypes.open_url,
                                         title='Get Started',
                                         value='https://docs.microsoft.com/en-us/azure/bot-service/')],
+                    )
+    return CardFactory.hero_card(card)
+
+def dog_card() -> Attachment:
+    card = HeroCard(title='',
+                    images=[CardImage(url='https://ogimg.infoglobo.com.br/in/23385661-a7d-b19/GEOMIDIA/375/xboo.jpg.pagespeed.ic.eoDpEM4vvQ.jpg')],
+                    buttons=[CardAction(type=ActionTypes.open_url,
+                                        title='Olha esse cachorro, que fofo!')]
+                    )
+    return CardFactory.hero_card(card)
+
+def duck_card() -> Attachment:
+    card = HeroCard(title='',
+                    images=[CardImage(url='https://www.google.com/search?q=patinho+filhote&safe=off&client=firefox-b-d&tbm=isch&source=iu&ictx=1&fir=dJkuCaVX6O8WKM%253A%252CEv-mTVoqvAJTmM%252C_&vet=1&usg=AI4_-kQqX2UNnW4ElAT3vy1lR1uqSI8IeQ&sa=X&ved=2ahUKEwj3iPCApfrgAhXeEbkGHWc6CO8Q9QEwAHoECAAQBA#imgrc=dJkuCaVX6O8WKM:')],
+                    buttons=[CardAction(type=ActionTypes.open_url,
+                                        title='Olha esse pato, que fofo!')],
                     )
     return CardFactory.hero_card(card)
 
@@ -154,29 +182,17 @@ async def handle_message(context: TurnContext) -> web.Response:
         else:
             state.in_prompt = True
             prompt_message = await create_reply_activity(context.activity, 'Which card would you like to see?\n'
-                                                                           '(1) Adaptive Card\n'
-                                                                           '(2) Animation Card\n'
-                                                                           '(3) Audio Card\n'
-                                                                           '(4) Hero Card\n'
-                                                                           '(5) Receipt Card\n'
-                                                                           '(6) Signin Card\n'
-                                                                           '(7) Thumbnail Card\n'
-                                                                           '(8) Video Card\n'
-                                                                           '(9) All Cards')
+                                                                           '(1) Cachorro\n'
+                                                                           '(2) Pato\n'
+                                                                           '(3) Kiwi\n')
             await context.send_activity(prompt_message)
             return web.Response(status=202)
     else:
         state.in_prompt = True
-        prompt_message = await create_reply_activity(context.activity, 'Which card would you like to see?\n'
-                                                                       '(1) Adaptive Card\n'
-                                                                       '(2) Animation Card\n'
-                                                                       '(3) Audio Card\n'
-                                                                       '(4) Hero Card\n'
-                                                                       '(5) Receipt Card\n'
-                                                                       '(6) Signin Card\n'
-                                                                       '(7) Thumbnail Card\n'
-                                                                       '(8) Video Card\n'
-                                                                       '(9) All Cards')
+            prompt_message = await create_reply_activity(context.activity, 'Which card would you like to see?\n'
+                                                                           '(1) Cachorro\n'
+                                                                           '(2) Pato\n'
+                                                                           '(3) Kiwi\n')
         await context.send_activity(prompt_message)
         return web.Response(status=202)
 
@@ -184,18 +200,9 @@ async def handle_message(context: TurnContext) -> web.Response:
 async def card_response(context: TurnContext) -> web.Response:
     response = context.activity.text.strip()
     choice_dict = {
-        '1': [create_adaptive_card], 'adaptive card': [create_adaptive_card],
-        '2': [create_animation_card], 'animation card': [create_animation_card],
-        '3': [create_audio_card], 'audio card': [create_audio_card],
-        '4': [create_hero_card], 'hero card': [create_hero_card],
-        '5': [create_receipt_card], 'receipt card': [create_receipt_card],
-        '6': [create_signin_card], 'signin card': [create_signin_card],
-        '7': [create_thumbnail_card], 'thumbnail card': [create_thumbnail_card],
-        '8': [create_video_card], 'video card': [create_video_card],
-        '9': [create_adaptive_card, create_animation_card, create_audio_card, create_hero_card,
-              create_receipt_card, create_signin_card, create_thumbnail_card, create_video_card],
-        'all cards': [create_adaptive_card, create_animation_card, create_audio_card, create_hero_card,
-                      create_receipt_card, create_signin_card, create_thumbnail_card, create_video_card]
+        '1': [dog_card], 'hero card': [dog_card],
+        '2': [duck_card], 'hero card': [duck_card],
+        '3': [create_hero_card], 'hero card': [create_hero_card],
     }
 
     # Get the functions that will generate the card(s) for our response
